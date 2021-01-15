@@ -11,8 +11,7 @@ And then set the optical flow stored path to the item "optTstPth" in the config.
 
 The provided demo is based on UCSD ped1 dataset, if you want to run the code for your dataset, you should first train the multi-scale maximum pyramid template first, store the template in a suitable path, and set the path to item "tmpPth" in config.ini.
 
-To run the code, you should first modify the config.ini, which has all 
-the parameters of the testing. 
+Currently, you can run the code tst_one.py directly using the uploaded test frames.
 
 
 
