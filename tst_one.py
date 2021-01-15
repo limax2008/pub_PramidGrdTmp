@@ -67,14 +67,6 @@ histMDic, binMDic = abnFeaObj.obtMultScaleHistFrmBase(hist3, bin3)
 # normalize
 histNsumFea, histNbinFea = abnFeaObj.normlizeDicFea(histMDic, binMDic)
 
-# smooth the templates 
-# for k,v in histBinTmpDicTmp.items():
-#     for i in range(v.shape[2]):
-#         tmp = cv2.GaussianBlur(v[...,i], (3,3), 0.5)
-#         tmp = np.max(v)
-#         v[...,i]=tmp
-#     histBinTmpDicTmp[k]=v
-
 abnDetObj = AbnDetDic(histBinTmpDicTmp, histNbinFea, bg)
 # anormaly detection on multiscale
 
@@ -91,21 +83,17 @@ olBg = olObj.calOnlineBg()
 cmb2MapsObj = cmb2kindMapDic(abnBinMaps, abnParMaps, bg, olBg)
 abnBinMaps = cmb2MapsObj.cmbMapsDic()
 
-
 # combine multiscale results
 cmbObj = AbnCmbMaps(abnBinMaps)
-pramidMaps = cmbObj.cmbMapsPyramid()
 voteMaps = cmbObj.cmbMapsByVote(vote=1)
 
 # filtering result
 flterObj = AbnMapFilter(voteMaps, olBg)
 voteMaps = flterObj.filterAbnMap()
-flterObj = AbnMapFilter(pramidMaps, olBg)
-pramidMaps = flterObj.filterAbnMap()
 
 # filtering at temporal axis
 voteMaps = utils.filterMaps(voteMaps)
-pramidMaps =utils.filterMaps(pramidMaps)  
+
 
 # %%
 '''
@@ -124,6 +112,8 @@ img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 img = cv2.resize(img,(160,120))
 imglist=[]
 namelist=[]
+imglist.append(img)
+namelist.append('originImg')
 for i in range(4):
     shwMap = abnBinMaps[i+1][selId,...]
     shwObj = AbnShw1Map(shwMap, img)
@@ -131,12 +121,11 @@ for i in range(4):
     imglist.append(tmp)
     namelist.append('scale:'+str(i))
 
-shwObj = AbnShw1Map(pramidMaps[selId,...], img)
-imglist.append(shwObj.obtAbnShwMap())
+
+# imglist.append(shwObj.obtAbnShwMap())
 shwObj = AbnShw1Map(voteMaps[selId,...], img)
 imglist.append(shwObj.obtAbnShwMap())
 
-namelist.append('pramid')
 namelist.append('vote')
 utils.shwImgs([2,3], imgList=imglist, nameList= namelist)
 # %%
@@ -152,9 +141,6 @@ evlObj = AbnRoc(voteMaps, gt)
 fpr, tpr, auc = evlObj.abnMapsRoc()
 print('---vote auc{}'.format(auc))
 
-evlObj = AbnRoc(pramidMaps, gt)
-fpr, tpr, auc = evlObj.abnMapsRoc()
-print('---pramidMaps auc{}'.format(auc))
 
 # fpr, tpr, auc = evlObj.myRoc(abnBinMaps,gt)
 # %%
