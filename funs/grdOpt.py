@@ -9,7 +9,7 @@ import numpy as np
 import cv2
 # from skimage.segmentation import slic
 import os
-from funs.Const import const
+# from funs.Const import const
 from sklearn.metrics import roc_curve, auc, roc_auc_score
 import matplotlib.pyplot as plt
 from numba import jit
@@ -234,7 +234,7 @@ class gridAppGrd1video():
 class GridOptFlow():
     """ initializtion path the continuity frames """
 
-    def __init__(self, pth=None, h=const.IMG_RESIZE_H, w=const.IMG_RESIZE_W):
+    def __init__(self, pth=None, h=120, w=160):
         # the image folder path
         self.pth = pth
         # width of the resized image
@@ -295,7 +295,7 @@ class GridOptFlow():
             flws.append(deepFlow)
         return flws
 
-    def optFlw2Prior(self, flw, hist_num=const.OPT_HIST_NUM):
+    def optFlw2Prior(self, flw, hist_num=8):
         '''
         optical flow to prior knowledge
         input: 
@@ -368,11 +368,11 @@ class AbnFea():
     # hist feature on optical flow
     # get the histogram feature from optical flows
     # ======================================================
-    def ObtGridOptHistFea(self, winSize=const.WIN_SIZE,
-                          winStep=const.WIN_STEP,
-                          tprLen=const.TPR_LEN,
-                          tprStep=const.TPR_STEP,
-                          hist_num=const.OPT_HIST_NUM):
+    def ObtGridOptHistFea(self, winSize=3,
+                          winStep=3,
+                          tprLen=5,
+                          tprStep=1,
+                          hist_num=2):
         '''
         fast optical flow histogram without normalization
         input:
@@ -409,11 +409,11 @@ class AbnFea():
         return histFea, histFeaBins
 
     # this method is the same to fore-method
-    def fastObtOptHistFea(self, winSize=const.WIN_SIZE,
-                          winStep=const.WIN_STEP,
-                          tprLen=const.TPR_LEN,
-                          tprStep=const.TPR_STEP,
-                          hist_num=const.OPT_HIST_NUM):
+    def fastObtOptHistFea(self, winSize=3,
+                          winStep=3,
+                          tprLen=5,
+                          tprStep=1,
+                          hist_num=2):
         '''
         fast optical flow histogram 
         input:
@@ -714,7 +714,7 @@ class AbnDetDic():
         return self._calMaxHistDis(frmHist,tmp, deta)
 
 
-    def abn1PartialFrmHistFea(self, histFea, optFlwPrior, deta=const.ABN_DETA, coef=0.8):
+    def abn1PartialFrmHistFea(self, histFea, optFlwPrior, deta=0.01, coef=0.8):
         '''
         anormaly detection between frame and template (coef * template)
         :param histFea: frame histogram [n.h,w]
@@ -735,7 +735,7 @@ class AbnDetDic():
             abnPartialMap[t, ...] = dd1
 
         return abnPartialMap
-    def abn1FrmHistFea(self, histFea, optFlwPrior, deta=const.ABN_DETA):
+    def abn1FrmHistFea(self, histFea, optFlwPrior, deta=0.01):
         '''
         anormaly detection from hist feature
         @input:
@@ -1027,7 +1027,7 @@ class AbnDet():
         # superpixel labels
         self.spTst = spTmp
 
-    def abn1FrmHistFea(self, histFea, optFlwPrior, deta=const.ABN_DETA):
+    def abn1FrmHistFea(self, histFea, optFlwPrior, deta=0.01):
         '''
         anormaly detection from hist feature
         @input:
@@ -1051,8 +1051,8 @@ class AbnDet():
         return abnMap
 
     def abn1FrmOptFlw(self, mask=None,
-                      HIST_NUM=const.OPT_HIST_NUM,
-                      deta=const.ABN_DETA):
+                      HIST_NUM=8,
+                      deta=0.01):
         '''
         abnormal detection from one optical flow
         @input:
@@ -1387,11 +1387,11 @@ class GridTrain():
         self.optFlw = optFlws
 
     @jit
-    def trainHistAveSumMax(self, winSize=const.WIN_SIZE,
-                           winStep=const.WIN_STEP,
-                           tprLen=const.TPR_LEN,
-                           tprStep=const.TPR_STEP,
-                           hist_num=const.OPT_HIST_NUM):
+    def trainHistAveSumMax(self, winSize=3,
+                           winStep=3,
+                           tprLen=5,
+                           tprStep=1,
+                           hist_num=8):
         '''
         get the prior knowledge
         get the maximum in each position of each window,
@@ -1448,11 +1448,11 @@ class GridTrain():
         return histAvePrior, histSumPrior
 
     @jit
-    def trainHistAveMax(self, winSize=const.WIN_SIZE,
-                        winStep=const.WIN_STEP,
-                        tprLen=const.TPR_LEN,
-                        tprStep=const.TPR_STEP,
-                        hist_num=const.OPT_HIST_NUM):
+    def trainHistAveMax(self, winSize=3,
+                        winStep=3,
+                        tprLen=5,
+                        tprStep=1,
+                        hist_num=2):
         '''
         get the prior knowledge
         get the maximum in each position of each window
@@ -1502,11 +1502,11 @@ class GridTrain():
 
         return histPrior
 
-    def trainHistMax(self, winSize=const.WIN_SIZE,
-                     winStep=const.WIN_STEP,
-                     tprLen=const.TPR_LEN,
-                     tprStep=const.TPR_STEP,
-                     hist_num=const.OPT_HIST_NUM):
+    def trainHistMax(self, winSize=3,
+                     winStep=3,
+                     tprLen=5,
+                     tprStep=1,
+                     hist_num=2):
         '''
         get the prior knowledge
         get the maximum in each position of each window patch

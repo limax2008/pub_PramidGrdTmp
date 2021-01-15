@@ -6,31 +6,7 @@ from sklearn.cluster import k_means_
 import os
 from numpy.lib.stride_tricks import as_strided
 
-def chi2Kmeans(dt, nclust=3):
-    """ kmean using the chi2 distance 
-    dt ----- list,  one row for one image
-    nclust ----- int, number of clusters
-    """
-    def euc_dist(X, Y = None, Y_norm_squared = None, squared = False):
-        return additive_chi2_kernel(X, Y)
-    k_means_.euclidean_distances = euc_dist
-    kmeans = k_means_.KMeans(n_clusters = nclust, n_jobs = 2, random_state = 3425)
-    km = kmeans.fit(dt)
-    return km
 
-def drwImgRect(img, x, y, w, h):
-    """ draw the rectangel on the img
-    according to the x,y ,w ,h
-     """
-    if len(img.shape) == 2:
-        image = np.expand_dims(img, axis=2)
-        image = np.concatenate((image, image, image), axis=2)
-        image = image.astype(np.uint8)
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    else:
-
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    return image
 
 def getAbnScoreMap(spLabels, abnLabels, abnScore):
     """
@@ -47,23 +23,6 @@ def getAbnScoreMap(spLabels, abnLabels, abnScore):
         tmp = spLabels == l
         shwMap[tmp] = abnScore[i]
     return shwMap
-
-def shw3imgs(shwMap, imgCol, out):
-    plt.subplot(1, 3, 1)
-    plt.title(' score map')
-    plt.imshow(shwMap)
-    plt.axis('off')
-    
-    plt.subplot(1,3,2)
-    plt.title('abnormal color map')
-    plt.imshow(imgCol.astype(np.uint8))
-    plt.axis('off')
-    
-    plt.subplot(1,3,3)
-    plt.title('superpixel')
-    # out=mark_boundaries(img, spLabels)
-    plt.imshow(out)
-    plt.axis('off')
 
 
 def shwAbnSpColImg(img, spLabels, abnLabels):
